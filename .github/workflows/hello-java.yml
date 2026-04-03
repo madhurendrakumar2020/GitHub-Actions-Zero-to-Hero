@@ -20,6 +20,6 @@ jobs:
 
     - name: Compile and run App.java
       run: |
-        cd src/main/java/com/example
-        javac App.java
-        java App
+        cd src/main/java
+        javac com/example/App.java
+        java com.example.App
