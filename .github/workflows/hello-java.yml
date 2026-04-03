@@ -1,45 +1,29 @@
-name: Hello Java CI
+name: Java CI
 
 on:
   push:
-    paths:
-      - 'src/**'
-      - 'pom.xml'
-  pull_request:
-    paths:
-      - 'src/**'
-      - 'pom.xml'
-
-concurrency:
-  group: ${{ github.ref }}
-  cancel-in-progress: true
 
 jobs:
-  build-and-run:
+  build:
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        java-version: [11, 17]
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
-          cache: 'maven'
+          java-version: ${{ matrix.java-version }}
+          cache: maven
 
-      - name: Build with Maven
-        shell: bash
-        run: |
-          if [ -x ./mvnw ]; then
-            ./mvnw -B -DskipTests package
-          else
-            mvn -B -DskipTests package
-          fi
+      - name: Build
+        run: mvn -B -DskipTests package
 
-      - name: Run HelloWorld
-        shell: bash
-        run: |
-          echo "Running HelloWorld"
-          java -cp target/classes com.example.App
+      - name: Run tests
+        run: mvn -B test
