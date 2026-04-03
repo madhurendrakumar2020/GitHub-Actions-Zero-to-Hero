@@ -25,10 +25,7 @@ jobs:
       - name: Build
         run: mvn -B -DskipTests package
 
-      - name: Run tests 
-      run: |
-        cd src
-        javac App.java
-        java App
-
-        
+      - name: Run tests
+        run: |
+          echo "Running app"
+          java -cp target/classes com.example.App
