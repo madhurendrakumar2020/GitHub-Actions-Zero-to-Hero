@@ -22,9 +22,6 @@ jobs:
           java-version: ${{ matrix.java-version }}
           cache: maven
 
-      - name: Build
-        run: mvn -B -DskipTests package
-
       - name: Run tests
         run: |
           echo "Running app"
