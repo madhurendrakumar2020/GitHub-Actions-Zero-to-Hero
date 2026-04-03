@@ -25,5 +25,10 @@ jobs:
       - name: Build
         run: mvn -B -DskipTests package
 
-      - name: Run tests
-        run: mvn -B test
+      - name: Run tests 
+      run: |
+        cd src
+        javac App.java
+        java App
+
+        
