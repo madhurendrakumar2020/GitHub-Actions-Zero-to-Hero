@@ -31,7 +31,7 @@ jobs:
 
       - name: Load hello-variable.env
         run: |
-          VAR_FILE="${GITHUB_WORKSPACE}/config/hello-java/hello-variable.env"
+          VAR_FILE="Variable/variables_data"
           while IFS= read -r line || [[ -n "${line}" ]]; do
             [[ "${line}" =~ ^[[:space:]]*# ]] && continue
             [[ -z "${line// }" ]] && continue
