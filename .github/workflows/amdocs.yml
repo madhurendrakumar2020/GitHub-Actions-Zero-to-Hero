@@ -1,0 +1,55 @@
+# Variables live only in this file — no separate variable file.
+name: Amdocs
+
+on:
+  workflow_dispatch:
+    inputs:
+      env:
+        description: Sample env string (blank allowed)
+        required: false
+        default: ''
+        type: string
+      cache:
+        description: Cache choice
+        required: true
+        default: 'no'
+        type: choice
+        options:
+          - 'no'
+          - 'yes'
+
+# Workflow-wide defaults (used when you reference ${{ env.* }} below)
+env:
+  PROJECT_NAME: amdocs
+  DEFAULT_CACHE: 'no'
+
+jobs:
+  demo:
+    runs-on: ubuntu-22.04
+
+    # Job-level variables (override or add to workflow env)
+    env:
+      STAGE: learning
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Apply manual inputs to env
+        run: |
+          echo "RUN_ENV=${{ inputs.env }}" >> "${GITHUB_ENV}"
+          echo "RUN_CACHE=${{ inputs.cache }}" >> "${GITHUB_ENV}"
+
+      - name: Show variables defined in this YAML + inputs
+        run: |
+          echo "PROJECT_NAME=${PROJECT_NAME}"
+          echo "DEFAULT_CACHE=${DEFAULT_CACHE}"
+          echo "STAGE=${STAGE}"
+          echo "RUN_ENV=${RUN_ENV}"
+          echo "RUN_CACHE=${RUN_CACHE}"
+
+      - name: Use expression syntax (same values)
+        run: |
+          echo "project=${{ env.PROJECT_NAME }}"
+          echo "stage=${{ env.STAGE }}"
+          echo "run_cache=${{ env.RUN_CACHE }}"
