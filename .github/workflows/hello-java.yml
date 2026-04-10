@@ -1,25 +1,65 @@
+# Learning workflow: hello-variable.env + manual parameters (env string, cache yes|no).
 name: Java CI
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      env:
+        description: Parameter — sample env string (blank allowed)
+        required: false
+        default: ''
+        type: string
+      cache:
+        description: Choice — cache (yes or no)
+        required: true
+        default: 'no'
+        type: choice
+        options:
+          - 'no'
+          - 'yes'
 
 jobs:
   build:
     runs-on: ubuntu-22.04
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Set up JDK 11
-      uses: actions/setup-java@v1
-      with:
-        java-version: '11'
+      - name: Load hello-variable.env
+        run: |
+          VAR_FILE="${GITHUB_WORKSPACE}/config/hello-java/hello-variable.env"
+          while IFS= read -r line || [[ -n "${line}" ]]; do
+            [[ "${line}" =~ ^[[:space:]]*# ]] && continue
+            [[ -z "${line// }" ]] && continue
+            echo "${line}" >> "${GITHUB_ENV}"
+          done < "${VAR_FILE}"
 
-    - name: Compile and run App.java
-      run: |
-        cd src/main/java
-        javac com/example/App.java
-        java com.example.App
+      - name: Apply workflow inputs (manual runs only)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          {
+            echo "env=${{ inputs.env }}"
+            echo "cache=${{ inputs.cache }}"
+          } >> "${GITHUB_ENV}"
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "11"
+
+      - name: Show parameters (verify hello-variable)
+        run: |
+          echo "=== hello-variable / parameters ==="
+          echo "env=${env:-}"
+          echo "cache=${cache:-}"
+
+      - name: Compile and run App.java
+        run: |
+          cd src/main/java
+          javac com/example/App.java
+          java com.example.App
